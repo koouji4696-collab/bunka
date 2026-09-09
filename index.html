@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>19世紀文化調べ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ===================== 設定はここ（CONFIG） ===================== */
+/* JavaScript の CONFIG は <script> 冒頭にあります */
+
+:root{
+  --paper:#EAE1CB;      /* 古い紙 */
+  --paper-2:#F5EFE0;    /* カード台紙 */
+  --ink:#22303E;        /* プルシアンブルーの墨 */
+  --sepia:#4B3F34;      /* 本文 */
+  --mauve:#6E3B78;      /* モーヴ（1856年に合成された19世紀の色）*/
+  --gold:#A8862E;       /* 金の縁取り */
+  --rule:#B9AB8B;
+  --ok:#2E6B4F; --ng:#8E2F2F;
+  --disp:'Shippori Mincho','Noto Serif JP',serif;
+  --body:'Noto Serif JP','Shippori Mincho',serif;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;font-family:var(--body);color:var(--sepia);line-height:1.85;font-size:15px;
+  background:
+    radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.35),transparent 55%),
+    radial-gradient(ellipse at 100% 100%,rgba(110,59,120,.08),transparent 50%),
+    var(--paper);}
+a{color:var(--mauve)}
+button{font-family:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit;font-size:15px;color:var(--sepia)}
+
+/* ---- 表紙 ---- */
+header{background:var(--ink);color:var(--paper-2);padding:28px 20px 22px;position:relative;overflow:hidden}
+header::after{content:"";position:absolute;inset:8px;border:1px solid rgba(245,239,224,.25);pointer-events:none}
+.hd{max-width:1080px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.hd h1{font-family:var(--disp);font-weight:800;font-size:40px;letter-spacing:.14em;margin:0;line-height:1.1}
+.hd h1 small{display:block;font-size:13px;font-weight:500;letter-spacing:.35em;margin-bottom:10px;opacity:.75}
+.hd .stat{font-family:var(--disp);text-align:right;font-size:13px;letter-spacing:.08em;opacity:.9}
+.hd .stat b{font-size:30px;font-weight:700;color:#E7C978;display:block;line-height:1}
+
+/* ---- タブ ---- */
+nav{max-width:1080px;margin:26px auto 0;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap}
+nav button{background:transparent;border:1px solid var(--rule);border-bottom:none;padding:10px 20px;
+  font-family:var(--disp);font-size:15px;letter-spacing:.1em;color:var(--sepia);border-radius:6px 6px 0 0;opacity:.7}
+nav button.on{background:var(--paper-2);opacity:1;color:var(--ink);font-weight:700;
+  box-shadow:0 -2px 0 var(--mauve) inset}
+nav button:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--mauve);outline-offset:2px}
+main{max-width:1080px;margin:0 auto;background:var(--paper-2);border:1px solid var(--rule);padding:28px 24px 40px;min-height:60vh}
+section{display:none}section.on{display:block}
+h2{font-family:var(--disp);font-size:22px;letter-spacing:.12em;color:var(--ink);margin:0 0 6px;font-weight:700}
+.lead{margin:0 0 20px;color:#6B5E50;max-width:44em}
+
+/* ---- フォーム部品 ---- */
+.who{display:grid;grid-template-columns:1.2fr 1fr auto;gap:12px;align-items:end;
+  padding:16px;border:1px dashed var(--rule);margin-bottom:22px}
+.who label{display:block;font-size:12px;letter-spacing:.1em;color:#7A6B5B;margin-bottom:4px}
+.who input{width:100%;padding:9px 10px;border:1px solid var(--rule);background:#fff;border-radius:3px}
+.btn{background:var(--ink);color:var(--paper-2);border:none;padding:11px 20px;border-radius:3px;
+  font-family:var(--disp);letter-spacing:.12em;font-size:15px}
+.btn.m{background:var(--mauve)}
+.btn.o{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.msg{padding:10px 14px;border-left:3px solid var(--gold);background:#fff8;margin:12px 0;font-size:14px}
+.msg.ng{border-color:var(--ng);color:var(--ng)}.msg.ok{border-color:var(--ok);color:var(--ok)}
+
+/* ---- 人物を選ぶ ---- */
+.genre{margin:22px 0 8px;font-family:var(--disp);font-size:16px;letter-spacing:.2em;color:var(--mauve);
+  border-bottom:1px solid var(--rule);padding-bottom:4px;display:flex;justify-content:space-between;align-items:baseline}
+.genre span{font-size:12px;color:#8A7B6A;letter-spacing:.05em}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.pick>div{background:#fff;border:1px solid var(--rule);text-align:left;padding:10px 12px;border-radius:3px;line-height:1.4}
+.pick>div b{display:block;font-family:var(--disp);font-size:16px;color:var(--ink);font-weight:700}
+.pick>div i{display:block;font-style:normal;font-size:12px;color:#8A7B6A}
+.pick>div.taken{background:transparent;border-style:dashed;opacity:.65}
+.pick>div i.t{color:var(--mauve)}
+.pick>div.mine{border:2px solid var(--mauve);background:#F8F0FA;opacity:1}
+.reveal{margin:18px auto 0;max-width:380px}
+.reveal .card dl{display:none}
+.reveal .card .in2{min-height:0}
+@media (prefers-reduced-motion:no-preference){.reveal .card{animation:flip .6s ease-out}}
+@keyframes flip{from{transform:rotateY(90deg);opacity:0}to{transform:none;opacity:1}}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.toolbar input{padding:8px 10px;border:1px solid var(--rule);border-radius:3px;background:#fff;min-width:200px}
+
+/* ---- カードを書く ---- */
+.write{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start}
+.write .f label{display:block;font-family:var(--disp);letter-spacing:.1em;color:var(--ink);font-size:14px;margin:14px 0 4px}
+.write .f label small{font-family:var(--body);color:#8A7B6A;letter-spacing:0;font-size:12px;margin-left:8px}
+.write .f textarea{width:100%;min-height:82px;padding:9px 10px;border:1px solid var(--rule);border-radius:3px;background:#fff;resize:vertical;line-height:1.7}
+.sticky{position:sticky;top:12px}
+.hint{font-size:13px;color:#7A6B5B;margin:6px 0 0}
+
+/* ---- キャビネットカード（このアプリの主役）---- */
+.card{background:var(--paper-2);color:var(--sepia);padding:14px;position:relative;
+  box-shadow:0 2px 0 #d9cfb8,0 8px 22px rgba(34,48,62,.18);width:100%;max-width:380px;margin:0 auto}
+.card .in{border:1px solid var(--gold);padding:4px;height:100%}
+.card .in2{border:1px solid var(--gold);padding:18px 18px 14px;min-height:460px;display:flex;flex-direction:column}
+.card .seal{width:74px;height:92px;border-radius:50%;margin:2px auto 10px;
+  background:var(--mauve);color:var(--paper-2);display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-size:40px;font-weight:800;box-shadow:inset 0 0 0 3px var(--paper-2),0 0 0 1px var(--mauve)}
+.card .nm{font-family:var(--disp);font-size:26px;font-weight:800;letter-spacing:.08em;color:var(--ink);text-align:center;line-height:1.2;margin:0}
+.card .meta{text-align:center;font-size:12px;color:#7A6B5B;letter-spacing:.06em;margin:6px 0 12px}
+.card .meta b{color:var(--mauve);font-weight:600;margin-right:10px}
+.card dl{margin:0;font-size:12.5px;line-height:1.7;border-top:1px solid var(--rule);padding-top:8px;flex:1}
+.card dt{font-family:var(--disp);color:var(--mauve);letter-spacing:.1em;font-size:12px;margin-top:7px}
+.card dd{margin:0;white-space:pre-wrap;word-break:break-word}
+.card dd.blank{color:#B0A48E;font-style:italic}
+.card .ft{margin-top:12px;border-top:1px solid var(--rule);padding-top:6px;font-size:10.5px;color:#8A7B6A;
+  display:flex;justify-content:space-between;letter-spacing:.06em}
+.card.small .in2{min-height:300px;padding:14px}
+.card.small dd{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card.small .nm{font-size:22px}
+
+/* ---- みんなのカード ---- */
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px;margin-top:16px}
+.gallery .card{cursor:pointer;max-width:none}
+.gallery .card:hover{transform:translateY(-2px)}
+.empty{padding:40px;text-align:center;color:#8A7B6A;border:1px dashed var(--rule)}
+dialog{border:none;background:transparent;padding:0;max-width:96vw}
+dialog::backdrop{background:rgba(34,48,62,.7)}
+dialog .card{max-width:420px}
+dialog .x{display:flex;gap:8px;justify-content:center;margin-top:12px}
+
+footer{max-width:1080px;margin:0 auto;padding:18px 20px;font-size:12px;color:#8A7B6A;letter-spacing:.08em}
+
+@media (max-width:820px){
+  .hd h1{font-size:30px}.who{grid-template-columns:1fr 1fr}.write{grid-template-columns:1fr}.sticky{position:static}
+}
+@media print{
+  header,nav,footer,.who,.toolbar,.write .f,dialog .x{display:none!important}
+  main{border:none;padding:0}.card{box-shadow:none;break-inside:avoid}
+  .gallery{grid-template-columns:repeat(2,1fr)}
+}
+@media (prefers-reduced-motion:no-preference){.gallery .card{transition:transform .15s}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd">
+    <h1><small>世界史探究 2026</small>19世紀文化調べ</h1>
+    <div class="stat"><b id="stDone">–</b>枚のカードが完成<br><span id="stClaim">–</span></div>
+  </div>
+</header>
+
+<nav>
+  <button class="on" data-tab="pick">① 担当を決める</button>
+  <button data-tab="write">② カードを書く</button>
+  <button data-tab="gallery">③ みんなのカード</button>
+</nav>
+
+<main>
+<!-- ================= ① 人物を選ぶ ================= -->
+<section id="pick" class="on">
+  <h2>担当する人物をくじで決める</h2>
+  <p class="lead">名前とクラスを入れて「くじを引く」を押すと、まだ誰も担当していない人物の中からランダムに一人が決まります。一人一人、違う人物になります。一度決まった担当は変わりません（変更したいときは先生に相談）。</p>
+  <div class="who">
+    <div><label>名前</label><input id="uName" placeholder="明星 花子"></div>
+    <div><label>クラス</label><input id="uCls" placeholder="高2-3"></div>
+    <button class="btn m" id="btnRandom">くじを引く</button>
+  </div>
+  <div id="pickMsg"></div>
+  <div id="result"></div>
+  <div class="toolbar">
+    <input id="pickSearch" placeholder="名前・国・担当者で探す">
+    <span class="hint" id="pickCount"></span>
+  </div>
+  <div id="pickList"></div>
+</section>
+
+<!-- ================= ② カードを書く ================= -->
+<section id="write">
+  <h2>人物紹介カードを書く</h2>
+  <p class="lead">名前とクラスを入れて「担当人物を呼び出す」を押してください。調べたことを項目ごとに書くと、右側のカードがその場で出来上がります。「保存して共有」を押すと③にみんなのカードとして並びます。あとから何度でも書き直せます。</p>
+  <div class="who">
+    <div><label>名前</label><input id="wName" placeholder="明星 花子"></div>
+    <div><label>クラス</label><input id="wCls" placeholder="高2-3"></div>
+    <button class="btn o" id="btnLoad">担当人物を呼び出す</button>
+  </div>
+  <div id="writeMsg"></div>
+  <div class="write" id="writeArea" style="display:none">
+    <div class="f" id="fields"></div>
+    <div class="sticky">
+      <div id="preview"></div>
+      <div style="text-align:center;margin-top:14px">
+        <button class="btn m" id="btnSave">保存して共有</button>
+      </div>
+      <p class="hint" style="text-align:center">最終保存：<span id="savedAt">未保存</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ③ みんなのカード ================= -->
+<section id="gallery">
+  <h2>みんなのカード</h2>
+  <p class="lead">クラス全員が調べた19世紀の人物たち。カードを押すと大きく表示できます。分野で絞り込んで、同じ時代を生きた人物どうしを見比べてみましょう。</p>
+  <div class="toolbar">
+    <select id="gGenre" style="padding:8px 10px;border:1px solid var(--rule);border-radius:3px;background:#fff"><option value="">すべての分野</option></select>
+    <input id="gSearch" placeholder="人物名・国・担当者で探す">
+    <button class="btn o" id="btnReload">最新にする</button>
+    <button class="btn o" onclick="window.print()">印刷する</button>
+  </div>
+  <div id="galleryList" class="gallery"></div>
+</section>
+</main>
+
+<footer>明星学園 世界史探究 ／ 19世紀文化調べ ／ 八幡</footer>
+
+<dialog id="dlg"><div id="dlgCard"></div><div class="x"><button class="btn o" id="dlgClose">閉じる</button></div></dialog>
+
+<script>
+/* ===================== ここだけ書き換えればOK ===================== */
+const CONFIG = {
+  API_URL: 'ここにGASのウェブアプリURLを貼る',   // 例 https://script.google.com/macros/s/XXXX/exec
+  SCHOOL:  '明星学園 世界史探究 2026',            // カードの下に印字される
+};
+/* ================================================================ */
+
+// カードの項目（Code.gs の CARD_FIELDS と同じ順番・同じ名前にする）
+const FIELDS = [
+  ['生い立ち',           'どこで生まれ、どんな環境で育ったか。転機となった出来事は？'],
+  ['代表作・業績',       '作品名や発見・発明を具体的に。何が新しかったのか。'],
+  ['時代背景とのつながり','産業革命・ナショナリズム・市民社会など、19世紀の動きとどう関わるか。'],
+  ['影響・評価',         '同時代や後世にどんな影響を与えたか。批判もあれば。'],
+  ['推しポイント',       'あなたがこの人物のここが面白いと思ったところを一言で。'],
+  ['参考資料',           '教科書ページ、資料集、本やサイトの名前。'],
+];
+
+let DATA = { figures: [], cards: {} };
+let MY = JSON.parse(localStorage.getItem('c19me') || '{}');   // {name, cls, id}
+
+// ---------- 通信 ----------
+async function apiGet(){
+  const r = await fetch(CONFIG.API_URL + '?action=list&t=' + Date.now());
+  return r.json();
+}
+async function apiPost(body){
+  const r = await fetch(CONFIG.API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(body) });
+  return r.json();
+}
+function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function msg(el, text, kind){ el.innerHTML = text ? `<div class="msg ${kind||''}">${esc(text)}</div>` : ''; }
+
+// ---------- 読み込み ----------
+async function load(){
+  if (CONFIG.API_URL.startsWith('ここに')) { msg(document.getElementById('pickMsg'), 'index.html の CONFIG.API_URL が未設定です。setup-guide.md を見て設定してください。', 'ng'); return; }
+  try{
+    const d = await apiGet();
+    if(!d.ok) throw new Error(d.error);
+    DATA = d;
+    renderStats(); renderPick(); renderGallery(); fillGenres();
+  }catch(e){ msg(document.getElementById('pickMsg'), '読み込めませんでした：' + e.message, 'ng'); }
+}
+function renderStats(){
+  const claimed = DATA.figures.filter(f=>f.owner).length;
+  document.getElementById('stDone').textContent = Object.keys(DATA.cards).length;
+  document.getElementById('stClaim').textContent = `担当決定 ${claimed} / ${DATA.figures.length} 人`;
+}
+function fillGenres(){
+  const sel = document.getElementById('gGenre');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">すべての分野</option>' + [...new Set(DATA.figures.map(f=>f.genre))].map(g=>`<option>${esc(g)}</option>`).join('');
+  sel.value = cur;
+}
+
+// ---------- ① 人物を選ぶ ----------
+function renderPick(){
+  const q = document.getElementById('pickSearch').value.trim();
+  const list = document.getElementById('pickList');
+  const groups = {};
+  DATA.figures.filter(f=>!q || (f.name+f.country+f.owner).includes(q)).forEach(f=>{ (groups[f.genre] ||= []).push(f); });
+  let html = '';
+  for (const g in groups){
+    const free = groups[g].filter(f=>!f.owner).length;
+    html += `<div class="genre">${esc(g)}<span>残り ${free} 人</span></div><div class="pick">`;
+    html += groups[g].map(f=>{
+      const mine = MY.id===f.id, taken = !!f.owner;
+      return `<div class="${taken?'taken':''} ${mine?'mine':''}">
+        <b>${esc(f.name)}</b><i>${esc(f.country)}　${esc(f.years)}</i>
+        <i class="t">${mine?'あなたの担当':taken?'担当：'+esc(f.cls)+' '+esc(f.owner):'未定'}</i></div>`;
+    }).join('') + '</div>';
+  }
+  list.innerHTML = html || '<div class="empty">該当する人物がいません</div>';
+  document.getElementById('pickCount').textContent = `全 ${DATA.figures.length} 人 / 未定 ${DATA.figures.filter(f=>!f.owner).length} 人`;
+}
+function readWho(prefix){
+  const name = document.getElementById(prefix+'Name').value.trim();
+  const cls  = document.getElementById(prefix+'Cls').value.trim();
+  return {name, cls};
+}
+async function claim(){
+  const who = readWho('u'), m = document.getElementById('pickMsg');
+  if(!who.name || !who.cls) return msg(m, '名前とクラスを先に入力してください。', 'ng');
+  msg(m, 'くじを引いています…');
+  document.getElementById('btnRandom').disabled = true;
+  const r = await apiPost({action:'claim', ...who});
+  document.getElementById('btnRandom').disabled = false;
+  if(!r.ok){ msg(m, r.error, 'ng'); return; }
+  MY = {...who, id: r.figure.id}; localStorage.setItem('c19me', JSON.stringify(MY));
+  msg(m, r.already ? 'すでに担当が決まっています。' : '決まりました！', 'ok');
+  document.getElementById('result').innerHTML = `<div class="reveal">${cardHTML(r.figure, {}, who.name, who.cls, true)}
+    <div style="text-align:center;margin:14px 0 24px"><button class="btn m" id="goWrite">この人物のカードを書く</button></div></div>`;
+  document.getElementById('goWrite').onclick = ()=> showTab('write');
+  await load();
+  fillWriteWho(); startWrite(r.figure);
+}
+document.getElementById('btnRandom').onclick = claim;
+document.getElementById('pickSearch').oninput = renderPick;
+
+// ---------- ② カードを書く ----------
+function fillWriteWho(){
+  document.getElementById('wName').value = MY.name||''; document.getElementById('wCls').value = MY.cls||'';
+  document.getElementById('uName').value = MY.name||''; document.getElementById('uCls').value = MY.cls||'';
+}
+let CUR = null;
+document.getElementById('btnLoad').onclick = async ()=>{
+  const who = readWho('w'), m = document.getElementById('writeMsg');
+  if(!who.name || !who.cls) return msg(m, '名前とクラスを入力してください。', 'ng');
+  msg(m, '確認しています…');
+  const r = await apiPost({action:'lookup', ...who});
+  if(!r.ok){ msg(m, r.error, 'ng'); return; }
+  MY = {...who, id:r.figure.id}; localStorage.setItem('c19me', JSON.stringify(MY));
+  msg(m, ''); startWrite(r.figure);
+};
+function startWrite(fig){
+  CUR = fig;
+  const card = DATA.cards[fig.id] || {};
+  const box = document.getElementById('fields');
+  box.innerHTML = `<div class="msg">担当：<b>${esc(fig.name)}</b>（${esc(fig.genre)}／${esc(fig.country)}／${esc(fig.years)}）</div>` +
+    FIELDS.map(([k,h])=>`<label>${esc(k)}<small>${esc(h)}</small></label><textarea data-k="${esc(k)}">${esc(card[k]||'')}</textarea>`).join('');
+  box.querySelectorAll('textarea').forEach(t=> t.oninput = renderPreview);
+  document.getElementById('savedAt').textContent = card['更新日時'] || '未保存';
+  document.getElementById('writeArea').style.display = '';
+  renderPreview();
+}
+function readFields(){ const o={}; document.querySelectorAll('#fields textarea').forEach(t=> o[t.dataset.k]=t.value.trim()); return o; }
+function renderPreview(){ document.getElementById('preview').innerHTML = cardHTML(CUR, readFields(), MY.name, MY.cls, false); }
+document.getElementById('btnSave').onclick = async ()=>{
+  const m = document.getElementById('writeMsg'); msg(m, '保存しています…');
+  const r = await apiPost({action:'save', id:CUR.id, name:MY.name, cls:MY.cls, fields: readFields()});
+  if(!r.ok) return msg(m, r.error, 'ng');
+  document.getElementById('savedAt').textContent = r.updated;
+  msg(m, '保存しました。「③ みんなのカード」で共有されています。', 'ok');
+  load();
+};
+
+// ---------- カードのHTML ----------
+function cardHTML(f, c, owner, cls, small){
+  const initial = (f.name||'?').replace(/[＝\.\s]/g,'').charAt(0);
+  return `<div class="card ${small?'small':''}" data-id="${f.id}"><div class="in"><div class="in2">
+    <div class="seal">${esc(initial)}</div>
+    <p class="nm">${esc(f.name)}</p>
+    <p class="meta"><b>${esc(f.genre)}</b>${esc(f.country)}　${esc(f.years)}</p>
+    <dl>${FIELDS.map(([k])=>`<dt>${esc(k)}</dt><dd class="${c[k]?'':'blank'}">${esc(c[k]||'（まだ書かれていません）')}</dd>`).join('')}</dl>
+    <div class="ft"><span>${esc(CONFIG.SCHOOL)}</span><span>調べた人：${esc(cls?cls+' ':'')}${esc(owner||'')}</span></div>
+  </div></div></div>`;
+}
+
+// ---------- ③ みんなのカード ----------
+function renderGallery(){
+  const g = document.getElementById('gGenre').value, q = document.getElementById('gSearch').value.trim();
+  const list = document.getElementById('galleryList');
+  const items = DATA.figures.filter(f=> DATA.cards[f.id] && (!g||f.genre===g) && (!q || (f.name+f.country+f.owner).includes(q)));
+  if(!items.length){ list.innerHTML = '<div class="empty">まだカードがありません。②で書いて「保存して共有」を押すとここに並びます。</div>'; return; }
+  list.innerHTML = items.map(f=> cardHTML(f, DATA.cards[f.id], f.owner, f.cls, true)).join('');
+  list.querySelectorAll('.card').forEach(el=> el.onclick = ()=>{
+    const f = DATA.figures.find(x=>x.id===el.dataset.id);
+    document.getElementById('dlgCard').innerHTML = cardHTML(f, DATA.cards[f.id], f.owner, f.cls, false);
+    document.getElementById('dlg').showModal();
+  });
+}
+document.getElementById('gGenre').onchange = renderGallery;
+document.getElementById('gSearch').oninput = renderGallery;
+document.getElementById('btnReload').onclick = load;
+document.getElementById('dlgClose').onclick = ()=> document.getElementById('dlg').close();
+
+// ---------- タブ ----------
+function showTab(id){
+  document.querySelectorAll('nav button').forEach(b=> b.classList.toggle('on', b.dataset.tab===id));
+  document.querySelectorAll('main section').forEach(s=> s.classList.toggle('on', s.id===id));
+  if(id==='gallery') load();
+  window.scrollTo({top:0});
+}
+document.querySelectorAll('nav button').forEach(b=> b.onclick = ()=> showTab(b.dataset.tab));
+
+// ---------- 起動 ----------
+fillWriteWho();
+load().then(()=>{
+  if(MY.id){ const f = DATA.figures.find(x=>x.id===MY.id); if(f && f.owner===MY.name && f.cls===MY.cls) startWrite(f); }
+});
+</script>
+</body>
+</html>
